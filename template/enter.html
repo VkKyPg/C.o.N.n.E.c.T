@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> Classes </title>
+    <link rel="stylesheet" type="text/css" href="../stylesheets/main.css">
+    <script src = '../javascript/d3.js'> </script>
+    <script src = '../javascript/marv1.js'></script>
+    <script type="text/javascript"> </script>
+  </head>
+  <body>
+    <!-- wrapper div -->
+    <div id = 'wrap'>
+
+      <div id='header'>
+        <h1> C.o.N.n.E.c.T</h1>
+      </div>
+      <!-- left columns -->
+      <div id = 'left' class = 'font'>
+        <!-- input class form -->
+        <form action = '/' method = 'POST'>
+          Class Name
+          <input type = 'text' name = 'classname' >
+          <br><br>
+          Class prereq
+          <input type = 'text' name = 'prereq' >
+          <input type = 'submit' value = 'Send to Data'>
+          <br><br>
+          ADD MORE?
+          <select name = 'user_input'>
+            <option value = 'yes'> Yes </option>
+            <option value = 'no'> No </option>
+          </select>
+        </form>
+        <br>
+        <!-- delete form -->
+        <form action = '/deleteall' method = "POST">
+          <input type="submit" value="Delete">
+        </form>
+      <!-- left columns -->
+      </div>
+
+      <!-- right columns -->
+      <div id = 'right' class = 'font'>
+        Current Classes Added
+        {% for classC in class_data%}
+          <br>
+          {{classC.classC_array}}
+          <br>
+        {% endfor %}
+      <!-- right columns -->
+      </div>
+
+
+
+      <!-- bottom -->
+      <div id = 'bottom'  class = 'font'>
+        C.o.n.n.e-c-t-i-n-g
+        <svg width="960px" height="800px"></svg>
+        <script>
+        (function() {
+          var R, d3cola, defs, enter_nodes, graph, height, l, links, n, nodes, svg, width, _i, _j, _len, _len1, _ref, _ref1;
+          {% autoescape false %}
+          graph  = {{json_data}};
+          {% endautoescape %}
+
+          /* objectify the graph
+           */
+
+
+           /* resolve node IDs (not optimized at all!)
+           */
+
+           _ref = graph.links;
+           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+             l = _ref[_i];
+             _ref1 = graph.nodes;
+             for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+               n = _ref1[_j];
+               if (l.source === n.id) {
+                 l.source = n;
+               }
+               if (l.target === n.id) {
+                 l.target = n;
+               }
+             }
+           }
+
+           R = 18;
+
+           svg = d3.select('svg');
+
+           width = svg.node().getBoundingClientRect().width;
+
+           height = svg.node().getBoundingClientRect().height;
+
+           defs = svg.append('defs');
+
+           /* define arrow markers for graph links
+           */
+
+
+           defs.append('marker').attr({
+             id: 'end-arrow',
+             viewBox: '0 0 10 10',
+             refX: 4 + R,
+             refY: 5,
+             orient: 'auto'
+           }).append('path').attr({
+             d: 'M0,0 L0,10 L10,5 z'
+           });
+
+           /* create nodes and links
+           */
+
+
+           links = svg.selectAll('.link').data(graph.links, function(d) {
+             return d.id;
+           });
+
+           links.enter().append('line').attr('class', 'link');
+
+           nodes = svg.selectAll('.node').data(graph.nodes, function(d) {
+             return d.id;
+           });
+
+           enter_nodes = nodes.enter().append('g').attr('class', 'node');
+
+           enter_nodes.append('circle').attr('r', R);
+
+           /* draw the label
+           */
+
+
+           enter_nodes.append('text').text(function(d) {
+             return d.id;
+           }).attr('dy', '0.35em');
+
+           /* cola layout
+           */
+
+
+           graph.nodes.forEach(function(v) {
+             v.width = 2.5 * R;
+             return v.height = 2.5 * R;
+           });
+
+           d3cola = cola.d3adaptor().size([width, height]).linkDistance(70).avoidOverlaps(true).flowLayout('y', 30).nodes(graph.nodes).links(graph.links).on('tick', function() {
+             /* update nodes and links
+             */
+             nodes.attr('transform', function(d) {
+               return "translate(" + d.x + "," + d.y + ")";
+             });
+             return links.attr('x1', function(d) {
+               return d.source.x;
+             }).attr('y1', function(d) {
+               return d.source.y;
+             }).attr('x2', function(d) {
+               return d.target.x;
+             }).attr('y2', function(d) {
+               return d.target.y;
+             });
+           });
+
+           enter_nodes.call(d3cola.drag);
+
+           d3cola.start(30, 30, 30);
+
+         }).call(this);
+          </script>
+      <!-- bottom -->
+      </div>
+      <!-- wrapper div -->
+    </div>
+  </body>
+</html>
